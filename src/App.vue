@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <FileUploader/>
     <Calculator/>
   </div>
 </template>
@@ -7,10 +8,12 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import Calculator from './components/Calculator.vue'
+import FileUploader from './components/FileUploader.vue'
 
 @Component({
   components: {
-    Calculator
+    Calculator,
+    FileUploader
   }
 })
 export default class App extends Vue {}

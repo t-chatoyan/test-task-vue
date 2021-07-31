@@ -1,6 +1,7 @@
 <template>
-  <div class="w-full max-w-xs mx-auto">
-    <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+  <div class="w-full max-w-xs mx-auto ">
+    <h2>Calculator</h2>
+    <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 border">
       <div class="mb-4">
         <label class="block text-gray-700 text-sm font-bold mb-2" for="numberOne">
           A
@@ -30,7 +31,8 @@
 
 <script lang="ts">
 import { Component, Model, Vue } from 'vue-property-decorator'
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
+import { Action } from 'vuex-class'
 
 export class calculatorObject {
   numberOne: number | null | undefined;
@@ -42,16 +44,6 @@ export class calculatorObject {
     ...mapGetters({
       calculatorSum: 'calculator/calculatorSum'
     })
-  },
-  methods: {
-    ...mapActions({
-      calculate: 'calculator/calculate'
-    }),
-    calculateSum () {
-      if (this.calculatorForm.numberOne && this.calculatorForm.numberTwo) {
-        this.calculate(this.calculatorForm)
-      }
-    }
   }
 })
 
@@ -60,5 +52,14 @@ export default class Calculator extends Vue {
     numberOne: null,
     numberTwo: null
   };
+
+  @Action('calculate')
+  calculate!: (calculate: Object) => void
+
+  public calculateSum () {
+    if (this.calculatorForm.numberOne && this.calculatorForm.numberTwo) {
+      this.calculate(this.calculatorForm)
+    }
+  }
 }
 </script>
