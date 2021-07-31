@@ -6,7 +6,7 @@
         <div class="flex w-full items-center justify-center text-center" id="app">
           <div class="p-32 bg-gray-100 border border-gray-300" @dragover="dragover" @dragleave="dragleave" @drop="drop">
             <input type="file" multiple name="fields" id="assetsFieldHandle"
-                   class="w-px h-px opacity-0 overflow-hidden absolute" ref="fileInput" @change="onChange" accept=".pdf,.jpg,.jpeg,.png" />
+                   class="w-px h-px opacity-0 overflow-hidden absolute" ref="fileInput" @change="onChangeInput" />
             <label for="assetsFieldHandle" class="block cursor-pointer">
               <span><span class="font-black">Choose a files</span> or drag it here</span>
             </label>
@@ -31,22 +31,28 @@ export default class FileUploader extends Vue {
     fileInput: HTMLFormElement
   }
 
-  public onChange (): void {
+  public onChangeInput () {
+    if (!this.$refs.fileInput.files) return
+    this.fileList = [...this.$refs.fileInput.files]
+    this.generateZip()
+  }
+
+  public async generateZip () {
     const zip = new JSZip()
-    this.fileList.map((file: any) => {
+
+    await this.fileList.map(function (file: any):void {
       zip.file(file.name, file)
     })
-    zip.generateAsync({ type: 'blob' }).then(function (blob: Blob) {
+
+    zip.generateAsync({
+      type: 'base64'
+    }).then(function (content: any) {
       const a = document.createElement('a')
       document.body.appendChild(a)
       a.classList.add('hidden')
-      const url = window.URL.createObjectURL(blob)
-      a.href = url
+      a.href = 'data:application/zip;base64,' + content
       a.download = 'test.zip'
       a.click()
-      window.URL.revokeObjectURL(url)
-    }, (err: any) => {
-      console.log(err)
     })
   }
 
@@ -64,8 +70,14 @@ export default class FileUploader extends Vue {
   }
 
   public drop (event: any): void {
+    this.fileList = []
     event.preventDefault()
-    this.onChange()
+    const droppedFiles = event.dataTransfer.files
+    if (!droppedFiles) return;
+    ([...droppedFiles]).forEach(file => {
+      this.fileList.push(file)
+    })
+    this.generateZip()
     event.currentTarget.classList.add('bg-gray-100')
     event.currentTarget.classList.remove('bg-green-300')
   }
